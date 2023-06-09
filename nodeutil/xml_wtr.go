@@ -56,7 +56,6 @@ func (wtr *XMLWtr) Node() node.Node {
 	return &Extend{
 		Base: wtr.container(0),
 		OnEndEdit: func(p node.Node, r node.NodeRequest) error {
-			println("Extend OnEndEdit: " + wtr.ident(r.Selection.Path))
 			ident := wtr.ident(r.Selection.Path)
 			if !meta.IsLeaf(r.Selection.Meta()) {
 				if err := wtr.endContainer(ident); err != nil {
@@ -79,7 +78,6 @@ func (wtr *XMLWtr) container(lvl int) node.Node {
 			return nil, nil
 		}
 		if !meta.IsList(r.Meta) {
-			println("onchild:" + wtr.ident(r.Path))
 			if err = wtr.beginContainer(wtr.ident(r.Path)); err != nil {
 				return nil, err
 			}
@@ -89,11 +87,9 @@ func (wtr *XMLWtr) container(lvl int) node.Node {
 	}
 	s.OnBeginEdit = func(r node.NodeRequest) error {
 		ident := wtr.ident(r.Selection.Path)
-		println("OnBeginEdit: " + ident)
 		if !meta.IsLeaf(r.Selection.Meta()) && !r.Selection.InsideList && !meta.IsList(r.Selection.Meta()) {
 			if lvl == 0 && first == true {
 				ident = wtr.ident(r.Selection.Path) + " xmlns=" + "\"" + meta.OriginalModule(r.Selection.Path.Meta).Ident() + "\""
-				println("OnBeginEdit: " + ident)
 				if err := wtr.beginContainer(ident); err != nil {
 					return err
 				}
@@ -103,7 +99,6 @@ func (wtr *XMLWtr) container(lvl int) node.Node {
 		return nil
 	}
 	s.OnEndEdit = func(r node.NodeRequest) error {
-		println("OnEndEdit: " + wtr.ident(r.Selection.Path))
 		//if !meta.IsList(r.Selection.Meta()) {
 		//if !r.Selection.IsList {
 		if r.Selection.InsideList {
@@ -119,7 +114,6 @@ func (wtr *XMLWtr) container(lvl int) node.Node {
 		return nil
 	}
 	s.OnField = func(r node.FieldRequest, hnd *node.ValueHandle) (err error) {
-		println("OnField: " + wtr.ident(r.Path) + "  Value: " + hnd.Val.String())
 		space := ""
 
 		if l, listable := hnd.Val.(val.Listable); listable {
@@ -139,7 +133,6 @@ func (wtr *XMLWtr) container(lvl int) node.Node {
 		if !r.New {
 			return
 		}
-		println("OnNext: " + wtr.ident(r.Selection.Path))
 
 		ident := wtr.ident(r.Selection.Path)
 
