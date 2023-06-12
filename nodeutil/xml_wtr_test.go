@@ -107,7 +107,7 @@ module m {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := `<c1 xmlns="m"><l1><l2><a>hi</a><b>bye</b></l2></l1></c1>`
+	expected := `<c1 xmlns="t"><l1><l2><a>hi</a><b>bye</b></l2></l1></c1>`
 	if actual != expected {
 		t.Errorf("\nExpected:%s\n  Actual:%s", expected, actual)
 	}
@@ -157,7 +157,7 @@ module m {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := `<c1 xmlns="m"><l1><l2><a>hi</a><b>99</b></l2></l1></c1>`
+	expected := `<c1 xmlns="t"><l1><l2><a>hi</a><b>99</b></l2></l1></c1>`
 	if actual != expected {
 		t.Errorf("\nExpected:%s\n  Actual:%s", expected, actual)
 	}
@@ -174,7 +174,7 @@ func TestQualifiedXmlIdentityRef(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fc.AssertEqual(t, `<type xmlns="module-test">module-types:derived-type</type>`, actual)
+	fc.AssertEqual(t, `<type xmlns="http://test.org/ns/yang/module/test">module-types:derived-type</type>`, actual)
 }
 
 func TestXmlLeafList(t *testing.T) {
@@ -208,7 +208,7 @@ module m {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := `<c xmlns="m"><l>hi</l><l>bye</l></c>`
+	expected := `<c xmlns="t"><l>hi</l><l>bye</l></c>`
 	if actual != expected {
 		t.Errorf("\nExpected:%s\n  Actual:%s", expected, actual)
 	}

@@ -89,7 +89,8 @@ func (wtr *XMLWtr) container(lvl int) node.Node {
 		ident := wtr.ident(r.Selection.Path)
 		if !meta.IsLeaf(r.Selection.Meta()) && !r.Selection.InsideList && !meta.IsList(r.Selection.Meta()) {
 			if lvl == 0 && first == true {
-				ident = wtr.ident(r.Selection.Path) + " xmlns=" + "\"" + meta.OriginalModule(r.Selection.Path.Meta).Ident() + "\""
+				ns := wtr.getXmlns(r.Selection.Path)
+				ident = wtr.ident(r.Selection.Path) + " xmlns=" + "\"" + ns + "\""
 				if err := wtr.beginContainer(ident); err != nil {
 					return err
 				}
@@ -99,8 +100,6 @@ func (wtr *XMLWtr) container(lvl int) node.Node {
 		return nil
 	}
 	s.OnEndEdit = func(r node.NodeRequest) error {
-		//if !meta.IsList(r.Selection.Meta()) {
-		//if !r.Selection.IsList {
 		if r.Selection.InsideList {
 			if err := wtr.endContainer(wtr.ident(r.Selection.Path)); err != nil {
 				return err
@@ -114,17 +113,17 @@ func (wtr *XMLWtr) container(lvl int) node.Node {
 		return nil
 	}
 	s.OnField = func(r node.FieldRequest, hnd *node.ValueHandle) (err error) {
-		space := ""
+		ns := ""
 
 		if l, listable := hnd.Val.(val.Listable); listable {
 			for i := 0; i < l.Len(); i++ {
-				wtr.writeLeafElement(space, r.Path, l.Item(i))
+				wtr.writeLeafElement(ns, r.Path, l.Item(i))
 			}
 		} else {
 			if lvl == 0 && first == true {
-				space = meta.OriginalModule(r.Path.Meta).Ident()
+				ns = wtr.getXmlns(r.Path)
 			}
-			wtr.writeLeafElement(space, r.Path, hnd.Val)
+			wtr.writeLeafElement(ns, r.Path, hnd.Val)
 		}
 
 		return nil
@@ -144,9 +143,19 @@ func (wtr *XMLWtr) container(lvl int) node.Node {
 	return s
 }
 
-func (wtr *XMLWtr) ident(p *node.Path /*, first bool*/) string {
+func (wtr *XMLWtr) ident(p *node.Path) string {
 	s := p.Meta.(meta.Identifiable).Ident()
 	return s
+}
+
+func (wtr *XMLWtr) getXmlns(p *node.Path) string {
+	ns := ""
+	if meta.OriginalModule(p.Meta).Namespace() == "" {
+		ns = meta.OriginalModule(p.Meta).Ident()
+	} else {
+		ns = meta.OriginalModule(p.Meta).Namespace()
+	}
+	return ns
 }
 
 func (wtr *XMLWtr) beginContainer(ident string) (err error) {
